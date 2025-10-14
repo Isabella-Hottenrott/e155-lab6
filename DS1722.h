@@ -5,7 +5,13 @@
 // TODO: <SHORT DESCRIPTION OF WHAT THIS FILE DOES>
 
 
-// configuration register is accessed with 00h for reads and 80h for writes
-// data is written to config reg MSb first for SPI communication
+#ifndef DS1722_H
+#define DS1722_H
+
+#include <stdint.h>
+#include <stm32l432xx.h>
 
 void ds1722_init(void);
+int ds1722_read_temp(void);
+
+#endif

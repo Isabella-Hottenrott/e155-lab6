@@ -4,6 +4,10 @@
 // TODO: <DATE>
 // TODO: <SHORT DESCRIPTION OF WHAT THIS FILE DOES>
 
+#include "STM32L432KC_RCC.h"
+#include "STM32L432KC_GPIO.h"
+#include "STM32L432KC_SPI.h"
+
 /* Enables the SPI peripheral and intializes its clock speed (baud rate), polarity, and phase.
  *    -- br: (0b000 - 0b111). The SPI clk will be the master clock / 2^(BR+1).
  *    -- cpol: clock polarity (0: inactive state is logical 0, 1: inactive state is logical 1).
@@ -27,7 +31,7 @@ SPI1->CR1 |= _VAL2FLD(SPI1_CR1_LSBFIRST, 0);   // msb transmitted first
         // configuretheCRCL and CRCEN bits if CRC isneeded
 SPI1->CR1 |= _VAL2FLD(SPI1_CR1_SSM, 1);   // slave select info driven by SSI
 //! !!!!!!!!! DO I WANT TO HAVE 1 DOWN HERE??
-PIx->CR1 |= _VAL2FLD(SPI1_CR1_SSI, 1);   // value forced onto NSS pin
+SPI1->CR1 |= _VAL2FLD(SPI1_CR1_SSI, 1);   // value forced onto NSS pin
 SPI1->CR1 |= _VAL2FLD(SPI1_CR1_MSTR, 1);   // msb transmitted first
 
 
