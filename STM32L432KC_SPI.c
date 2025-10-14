@@ -1,8 +1,5 @@
 // STM32L432KC_SPI.c
-// TODO: <YOUR NAME>
-// TODO: <YOUR EMAIL>
-// TODO: <DATE>
-// TODO: <SHORT DESCRIPTION OF WHAT THIS FILE DOES>
+
 
 #include "STM32L432KC_RCC.h"
 #include "STM32L432KC_GPIO.h"
@@ -17,39 +14,41 @@
 
 
 void initSPI(int br, int cpol, int cpha){
+
 SPIGPIO();
+
 RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
 //disable SPI for the configurations
 SPI1->CR1 &= ~(0b1);
 SPI1->CR2 &= ~(0b1); 
 
-SPI1->CR1 |= _VAL2FLD(SPI1_CR1_BR, br);   // set the Baud rate (will want 3)
-SPI1->CR1 |= _VAL2FLD(SPI1_CR1_CPOL, cpol);   // set CPOL (will want 0?)
-SPI1->CR1 |= _VAL2FLD(SPI1_CR1_CPHA, cpha);   // set CPHA (will want 0?)
-SPI1->CR1 |= _VAL2FLD(SPI1_CR1_BIDIMODE, 0);   // two line unidirectional data mode
-SPI1->CR1 |= _VAL2FLD(SPI1_CR1_LSBFIRST, 0);   // msb transmitted first
+SPI1->CR1 |= _VAL2FLD(SPI_CR1_BR, br);   // set the Baud rate (will want 3)
+SPI1->CR1 |= _VAL2FLD(SPI_CR1_CPOL, cpol);   // set CPOL (will want 0?)
+SPI1->CR1 |= _VAL2FLD(SPI_CR1_CPHA, cpha);   // set CPHA (will want 0?)
+SPI1->CR1 |= _VAL2FLD(SPI_CR1_BIDIMODE, 0);   // two line unidirectional data mode
+SPI1->CR1 |= _VAL2FLD(SPI_CR1_LSBFIRST, 0);   // msb transmitted first
         // configuretheCRCL and CRCEN bits if CRC isneeded
-SPI1->CR1 |= _VAL2FLD(SPI1_CR1_SSM, 1);   // slave select info driven by SSI
+SPI1->CR1 |= _VAL2FLD(SPI_CR1_SSM, 1);   // slave select info driven by SSI
 //! !!!!!!!!! DO I WANT TO HAVE 1 DOWN HERE??
-SPI1->CR1 |= _VAL2FLD(SPI1_CR1_SSI, 1);   // value forced onto NSS pin
-SPI1->CR1 |= _VAL2FLD(SPI1_CR1_MSTR, 1);   // msb transmitted first
+SPI1->CR1 |= _VAL2FLD(SPI_CR1_SSI, 1);   // value forced onto NSS pin
+SPI1->CR1 |= _VAL2FLD(SPI_CR1_MSTR, 1);   // msb transmitted first
 
 
 // to the SPI_CR2 Reg
-SPI1->CR2 |= _VAL2FLD(SPI1_CR2_DS, 7);
+SPI1->CR2 |= _VAL2FLD(SPI_CR2_DS, 7);
 SPI1->CR2 |= _VAL2FLD(SPI_CR2_FRXTH, 1); 
 SPI1->CR2 |= _VAL2FLD(SPI_CR2_SSOE, 0); 
 
 SPI1->CR1 |= (0b1); 
 }
 
-void SPIGPIO(void){
+void SPIGPIO(){
 // GPIO enables for SPI
 RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
 pinMode(PA1, GPIO_ALT); // PA1 == SCLK want AF5
 setAF(PA1);
-pinMode(PA4, GPIO_ALT); // PA10 = NSS  want AF5
-setAF(PA4);
+pinMode(PA10, GPIO_ALT); // PA10 = NSS  want AF5
+setAF(PA10);
 pinMode(PA6, GPIO_ALT); // PA6== MISO want AF5
 setAF(PA6);
 pinMode(PA7, GPIO_ALT); // PA7 = MOSI want AF5
@@ -82,7 +81,7 @@ GPIOA->ODR |= (0b1<<4); // set initial logic level to high (active low)
 // Read disapling SPI procedure from page 1337
 
 char spiSendReceive(char send){
-    while (!(SPI->SR & SPI_SR_TXE)); // wait until TX FIFO is empty
+    while (!(SPI1->SR & SPI_SR_TXE)); // wait until TX FIFO is empty
 
     *((volatile uint8_t *)&SPI1->DR) = (uint8_t)send; // Send a byte
 

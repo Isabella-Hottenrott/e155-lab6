@@ -1,11 +1,8 @@
 // DS1722.c
-// TODO: <YOUR NAME>
-// TODO: <YOUR EMAIL>
-// TODO: <DATE>
-// TODO: <SHORT DESCRIPTION OF WHAT THIS FILE DOES>
 
 #include "DS1722.h"
 #include "DS1722.h"
+#include "STM32L432KC_GPIO.h"
 
 // want to config SPI slave before themaster sends a clock
 // to avoid undesired data transmission
@@ -18,7 +15,7 @@
 
 void ds1722_init(int resolution){
     uint8_t cfg = 0xE0;
-    uint8_t DS1722_WR_CFG; = 0x80;
+    uint8_t DS1722_WR_CFG = 0x80;
 
     
     digitalWrite(22, PIO_HIGH); //pin PB6 is chip enable pin. set high
@@ -67,7 +64,7 @@ int ds1722_read_temp(void){
    
     int16_t raw = ((int16_t)upperhalf << 8) | lowerhalf; // keep sign by shifting arithmetic
     raw = raw >> 8;                       // shift by 8 because we only have 8 bit resolution but a 16 bit representation
-    (float) raw = raw *0.0625;
+    raw = raw *0.0625;
     return raw;
 }
 

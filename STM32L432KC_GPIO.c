@@ -120,10 +120,9 @@ void togglePin(int gpio_pin) {
 }
 
 void setAF(int pin){
-    // set pin to PAF5
-    GPIO->AFRL &= ~(0b0 << (4*pin+3));
-    GPIO->AFRL |= (0b1 << (4*pin+2));
-    GPIO->AFRL &= ~(0b0 << (4*pin+1));
-    GPIO->AFRL |= (0b1 << 4*pin);
+    GPIOA->AFR[0] &= ~(0b0 << (4*pin+3));
+    GPIOA->AFR[0] |= (0b1 << (4*pin+2));
+    GPIOA->AFR[0] &= ~(0b0 << (4*pin+1));
+    GPIOA->AFR[0] |= (0b1 << 4*pin);
 
 }

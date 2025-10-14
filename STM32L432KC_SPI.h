@@ -50,7 +50,7 @@
  * Refer to the datasheet for more low-level details. */ 
 void initSPI(int br, int cpol, int cpha);
 
-
+void SPIGPIO(void);
 
 /* Transmits a character (1 byte) over SPI and returns the received character.
  *    -- send: the character to send over SPI

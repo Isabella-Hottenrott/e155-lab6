@@ -69,7 +69,7 @@ int main(void) {
 
   initSPI(3,0,0);
 
-  ds1722_init();
+  ds1722_init(8);
 
   while(1) {
     /* Wait for ESP8266 to send a request.
@@ -103,7 +103,7 @@ int main(void) {
       sprintf(ledStatusStr,"LED is on!");
     else if (led_status == 0)
       sprintf(ledStatusStr,"LED is off!");
-    sprintf(tempStr, "%.2d", tempC)
+    sprintf(tempStr, "%.2d", temp);
 
     // finally, transmit the webpage over UART
     sendString(USART, webpageStart); // webpage header code

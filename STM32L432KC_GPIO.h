@@ -105,4 +105,6 @@ void digitalWrite(int gpio_pin, int val);
 
 void togglePin(int gpio_pin);
 
+void setAF(int pin);
+
 #endif

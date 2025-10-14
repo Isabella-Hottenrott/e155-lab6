@@ -49,7 +49,7 @@ USART_TypeDef * initUSART(int USART_ID, int baud_rate) {
 
             // Configure correct alternate functions
             GPIOA->AFR[0] |= (0b111 << GPIO_AFRL_AFSEL2_Pos);   //AF7
-            GPIOA->AFR[0] |= (0b011 << GPIO_AFRH_AFSEL3_Pos);  //AF3
+            GPIOA->AFR[0] |= (0b011 << GPIO_AFRL_AFSEL3_Pos);  //AF3
             break;
     }
 
