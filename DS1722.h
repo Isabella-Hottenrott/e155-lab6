@@ -7,6 +7,9 @@
 
 #include <stdint.h>
 #include <stm32l432xx.h>
+#include "STM32L432KC_GPIO.h"
+#include "STM32L432KC_SPI.h"
+
 
 void ds1722_init(int resolution);
 int ds1722_read_temp(void);

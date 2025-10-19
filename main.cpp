@@ -31,7 +31,7 @@ const String htmlStart = "<!DOCTYPE html><html>";
 const String htmlEnd = "</html>";
 
 // Defining network information
-const char * networkName = "Lab6ESP";  // Set this to the selected network SSID
+const char * networkName = 15;  // Set this to the selected network SSID
 const char * password    = NULL;          // Set this to a non-null value if selected network requires authentication
 String      ip;                           // Stores the current IP. Set in the setup function
 

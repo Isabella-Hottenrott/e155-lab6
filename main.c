@@ -10,10 +10,10 @@ Date: 9/14/19
 #include <stdlib.h>
 #include <stdio.h>
 
-#define LED_PIN PB3
+#define LED_PIN PA5
 #define BUFF_LEN 32
 
-/////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
 // Provided Constants and Functions
 /////////////////////////////////////////////////////////////////
 
@@ -48,9 +48,6 @@ int updateLEDStatus(char request[])
 	return led_status;
 }
 
-/////////////////////////////////////////////////////////////////
-// Solution Functions
-/////////////////////////////////////////////////////////////////
 
 int main(void) {
   configureFlash();
@@ -62,13 +59,15 @@ int main(void) {
   
   initTIM(TIM15);
 
-  pinMode(PB3, GPIO_OUTPUT);
-  digitalWrite(PB3, 0);
+  pinMode(LED_PIN, GPIO_OUTPUT);
+  digitalWrite(LED_PIN, 0);
+
+  pinMode(PB6, GPIO_OUTPUT); // PB6 = Chip Select
+  digitalWrite(PB6, PIO_LOW);
   
   USART_TypeDef * USART = initUSART(USART1_ID, 125000);
 
-  initSPI(3,0,0);
-
+  initSPI(3, 0, 1);
   ds1722_init(8);
 
   while(1) {
@@ -76,8 +75,6 @@ int main(void) {
     Requests take the form of '/REQ:<tag>\n', with TAG begin <= 10 characters.
     Therefore the request[] array must be able to contain 18 characters.
     */
-    // Do I need code here in doing this waiting ^
-
 
   
     // Receive web request from the ESP
@@ -92,18 +89,19 @@ int main(void) {
     }
   
     // Update string with current LED state
-  
-    int led_status = updateLEDStatus(request);
-    int temp = ds1722_read_temp();
+  int led_status = updateLEDStatus(request);
+  int temp = ds1722_read_temp();
 
     char ledStatusStr[20];
     char tempStr[32];
     
-    if (led_status == 1)
+    if (led_status == 1){
       sprintf(ledStatusStr,"LED is on!");
-    else if (led_status == 0)
+      }
+    else if (led_status == 0){
       sprintf(ledStatusStr,"LED is off!");
-    sprintf(tempStr, "%.2d", temp);
+      sprintf(tempStr, "%.2d", temp);
+    }
 
     // finally, transmit the webpage over UART
     sendString(USART, webpageStart); // webpage header code
