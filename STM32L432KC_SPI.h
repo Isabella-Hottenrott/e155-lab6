@@ -6,9 +6,12 @@
 
 #ifndef STM32L4_SPI_H
 #define STM32L4_SPI_H
+#include "STM32L432KC_GPIO.h"
+
 
 #include <stdint.h>
 #include <stm32l432xx.h>
+
 
 
 ///////////////////////////////////////////////////////////////////////////////

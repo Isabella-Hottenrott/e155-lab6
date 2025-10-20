@@ -13,6 +13,7 @@ Date: 9/14/19
 #define LED_PIN PA5
 #define BUFF_LEN 32
 
+
 ////////////////////////////////////////////////////////////////
 // Provided Constants and Functions
 /////////////////////////////////////////////////////////////////
@@ -62,8 +63,6 @@ int main(void) {
   pinMode(LED_PIN, GPIO_OUTPUT);
   digitalWrite(LED_PIN, 0);
 
-  pinMode(PB6, GPIO_OUTPUT); // PB6 = Chip Select
-  digitalWrite(PB6, PIO_LOW);
   
   USART_TypeDef * USART = initUSART(USART1_ID, 125000);
 
@@ -76,7 +75,7 @@ int main(void) {
     Therefore the request[] array must be able to contain 18 characters.
     */
 
-  
+
     // Receive web request from the ESP
     char request[BUFF_LEN] = "                  "; // initialize to known value
     int charIndex = 0;
