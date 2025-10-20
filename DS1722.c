@@ -15,37 +15,47 @@
 // DS1722 continuously CONVERTS in the background (after configuring it)
 // but neveractually drivesthe spi bus by itself
 
-void ds1722_init(int resolution){
-    uint8_t cfg = 0xE0;
+void ds1722_init(int config){
     uint8_t ds1722_cfg_addr = 0x80;
     uint8_t readconfig = 0x00;
-    digitalWrite(PB0, PIO_HIGH); //pin PB6 is chip enable pin
-    uint8_t trash1 = spiSendReceive(ds1722_cfg_addr);
-    uint8_t trash2 = spiSendReceive(cfg);
-    while (SPI1->SR & SPI_SR_BSY);
-    digitalWrite(PB0, PIO_LOW); 
+//    printf("%d", config);
 
-    digitalWrite(PB0, PIO_HIGH); //pin PB6 is chip enable pin
-    uint8_t config1 = spiSendReceive(readconfig);
-    uint8_t config2 = spiSendReceive(readconfig);
-    while (SPI1->SR & SPI_SR_BSY);
+    digitalWrite(PB0, 1); //pin PB6 is chip enable pin
+    spiSendReceive(ds1722_cfg_addr);
+    spiSendReceive(config);  //will need more than just this
+    digitalWrite(PB0, PIO_LOW);
+
+    digitalWrite(PB0, 1); //pin PB6 is chip enable pin
+    uint8_t config2 = spiSendReceive(0x00);
+    uint8_t config3 = spiSendReceive(0x00);
     digitalWrite(PB0, PIO_LOW); 
-    printf("%d", config2);
 }
 
 
 int ds1722_read_temp(void){
-    digitalWrite(PB0, PIO_HIGH); //pin PB6 is chip enable pin. set high
-    uint8_t trash1 = spiSendReceive(0x01);
-    uint8_t lowerhalf = spiSendReceive(0x01);
+    
 
-    uint8_t trash2 = spiSendReceive(0x02);
+    digitalWrite(PB0, PIO_HIGH); //pin PB6 is chip enable pin. set high
+    spiSendReceive(0x02);
     uint8_t upperhalf = spiSendReceive(0x02);
     digitalWrite(PB0, PIO_LOW); //pin PB6 is chip enable pin. set low
 
+    digitalWrite(PB0, PIO_HIGH); //pin PB6 is chip enable pin. set high
+    spiSendReceive(0x01);
+    uint8_t lowerhalf = spiSendReceive(0x01);
+    digitalWrite(PB0, PIO_LOW); //pin PB6 is chip enable pin. set high
+
+
+    printf("u dec %d\n", upperhalf);
+
+
+    printf("l dec %d\n", lowerhalf);
+
+    printf("\n");
+
    
     int16_t raw = ((int16_t)upperhalf << 8) | lowerhalf; // keep sign by shifting arithmetic
-    raw = raw >> 8;                       // shift by 8 because we only have 8 bit resolution but a 16 bit representation
+    raw = raw >> 8;                       // shift by 8 because we only have 8 bit but a 16 bit rep
     raw = raw *0.0625;
     return raw;
 }

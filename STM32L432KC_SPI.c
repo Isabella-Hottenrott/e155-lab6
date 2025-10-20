@@ -15,15 +15,18 @@
 
 void initSPI(int br, int cpol, int cpha){
 
-SPIGPIO();
+
+// GPIO enables for SPI
+RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
+RCC->AHB2ENR |= RCC_AHB2ENR_GPIOBEN;
 
 RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
 //disable SPI for the configurations
 SPI1->CR1 &= ~SPI_CR1_SPE;
 
-SPI1->CR1 |= _VAL2FLD(SPI_CR1_BR, br);   // set the Baud rate (will want 3)
-SPI1->CR1 |= _VAL2FLD(SPI_CR1_CPOL, cpol);   // set CPOL (will want 0?)// check this acc sets to 0
-SPI1->CR1 |= _VAL2FLD(SPI_CR1_CPHA, cpha);   // set CPHA (will want 1)// check this acc sets to 0
+SPI1->CR1 |= _VAL2FLD(SPI_CR1_BR, 0b011);   // set the Baud rate (will want 3)
+SPI1->CR1 |= _VAL2FLD(SPI_CR1_CPOL, 0);   // set CPOL (will want 0?)// check this acc sets to 0
+SPI1->CR1 |= _VAL2FLD(SPI_CR1_CPHA, 1);   // set CPHA (will want 1)// check this acc sets to 0
 SPI1->CR1 |= _VAL2FLD(SPI_CR1_BIDIMODE, 0);   // two line unidirectional data mode
 SPI1->CR1 |= _VAL2FLD(SPI_CR1_LSBFIRST, 0);   // msb transmitted first
 
@@ -36,13 +39,6 @@ SPI1->CR1 |= _VAL2FLD(SPI_CR1_MSTR, 1);   // master
 SPI1->CR2 |= _VAL2FLD(SPI_CR2_DS, 7);
 SPI1->CR2 |= _VAL2FLD(SPI_CR2_FRXTH, 1); 
 SPI1->CR2 |= _VAL2FLD(SPI_CR2_SSOE, 0);
-SPI1->CR1 |= SPI_CR1_SPE; 
-}
-
-void SPIGPIO(){
-// GPIO enables for SPI
-RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
-RCC->AHB2ENR |= RCC_AHB2ENR_GPIOBEN;
 
 pinMode(PB3, GPIO_ALT); // PB3 == SCLK want AF5
 GPIOB->AFR[0] |= (0b101 << GPIO_AFRL_AFSEL3_Pos);   //AF5
@@ -53,8 +49,11 @@ GPIOB->AFR[0] |= (0b101 << GPIO_AFRL_AFSEL5_Pos);   //AF5
 pinMode(PB0, GPIO_OUTPUT);                       // PB6 = Chip Select
 digitalWrite(PB0, PIO_LOW);
 
-//GPIOB->OSPEEDR |= GPIO_OSPEEDR_OSPEED3;
 
+GPIOB->OSPEEDR |= GPIO_OSPEEDR_OSPEED3;
+
+
+SPI1->CR1 |= SPI_CR1_SPE; 
 }
 
 
@@ -66,7 +65,7 @@ uint8_t spiSendReceive(uint8_t send){
     while (!(SPI1->SR & SPI_SR_TXE)); // wait until TX FIFO is empty
     *(volatile uint8_t *) (&SPI1->DR) = send; // Send a byte
     while (!(SPI1->SR & SPI_SR_RXNE));
-    return SPI1->DR;
-
-
+    uint8_t r = *(volatile uint8_t *)&SPI1->DR;
+    return r;
 }
+
