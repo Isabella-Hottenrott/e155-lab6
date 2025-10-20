@@ -54,7 +54,6 @@ pinMode(PB0, GPIO_OUTPUT);                       // PB6 = Chip Select
 digitalWrite(PB0, PIO_LOW);
 
 //GPIOB->OSPEEDR |= GPIO_OSPEEDR_OSPEED3;
-
 }
 
 
@@ -66,7 +65,7 @@ uint8_t spiSendReceive(uint8_t send){
     while (!(SPI1->SR & SPI_SR_TXE)); // wait until TX FIFO is empty
     *(volatile uint8_t *) (&SPI1->DR) = send; // Send a byte
     while (!(SPI1->SR & SPI_SR_RXNE));
-    return SPI1->DR;
-
-
+    uint8_t r = *(volatile uint8_t *)&SPI1->DR;
+    return r;
 }
+

@@ -19,23 +19,23 @@ void ds1722_init(int resolution){
     uint8_t cfg = 0xE0;
     uint8_t ds1722_cfg_addr = 0x80;
     uint8_t readconfig = 0x00;
-    digitalWrite(PB0, PIO_HIGH); //pin PB6 is chip enable pin
-    uint8_t trash1 = spiSendReceive(ds1722_cfg_addr);
-    uint8_t trash2 = spiSendReceive(cfg);
-    while (SPI1->SR & SPI_SR_BSY);
-    digitalWrite(PB0, PIO_LOW); 
 
-    digitalWrite(PB0, PIO_HIGH); //pin PB6 is chip enable pin
-    uint8_t config1 = spiSendReceive(readconfig);
-    uint8_t config2 = spiSendReceive(readconfig);
-    while (SPI1->SR & SPI_SR_BSY);
+    digitalWrite(PB0, 1); //pin PB6 is chip enable pin
+    spiSendReceive(ds1722_cfg_addr);
+    spiSendReceive(cfg);
+    digitalWrite(PB0, PIO_LOW);
+
+    digitalWrite(PB0, 1); //pin PB6 is chip enable pin
+    uint8_t config2 = spiSendReceive(0x00);
+    uint8_t config3 = spiSendReceive(0x00);
     digitalWrite(PB0, PIO_LOW); 
-    printf("%d", config2);
+    printf("%b\n", config3);
 }
 
 
 int ds1722_read_temp(void){
     digitalWrite(PB0, PIO_HIGH); //pin PB6 is chip enable pin. set high
+
     uint8_t trash1 = spiSendReceive(0x01);
     uint8_t lowerhalf = spiSendReceive(0x01);
 
