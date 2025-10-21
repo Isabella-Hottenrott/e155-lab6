@@ -4,6 +4,7 @@
 #include "STM32L432KC_GPIO.h"
 #include "STM32L432KC_SPI.h"
 #include <stdio.h>
+#include <math.h>
 
 
 // want to config SPI slave before themaster sends a clock
@@ -18,7 +19,6 @@
 void ds1722_init(int config){
     uint8_t ds1722_cfg_addr = 0x80;
     uint8_t readconfig = 0x00;
-//    printf("%d", config);
 
     digitalWrite(PB0, 1); //pin PB6 is chip enable pin
     spiSendReceive(ds1722_cfg_addr);
@@ -32,7 +32,7 @@ void ds1722_init(int config){
 }
 
 
-int ds1722_read_temp(void){
+float ds1722_read_temp(void){
     
 
     digitalWrite(PB0, PIO_HIGH); //pin PB6 is chip enable pin. set high
@@ -45,17 +45,8 @@ int ds1722_read_temp(void){
     uint8_t lowerhalf = spiSendReceive(0x01);
     digitalWrite(PB0, PIO_LOW); //pin PB6 is chip enable pin. set high
 
-
-    printf("u dec %d\n", upperhalf);
-
-
-    printf("l dec %d\n", lowerhalf);
-
-    printf("\n");
-
    
     int16_t raw = ((int16_t)upperhalf << 8) | lowerhalf; // keep sign by shifting arithmetic
-    raw = raw >> 8;                       // shift by 8 because we only have 8 bit but a 16 bit rep
-    raw = raw *0.0625;
-    return raw;
+    raw = raw >> 4;                       // shift by 8 because we only have 8 bit but a 16 bit rep
+    return (float) raw*0.0625f;
 }

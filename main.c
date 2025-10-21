@@ -9,17 +9,17 @@ Date: 9/14/19
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 
 #define LED_PIN PA5
-#define BUFF_LEN 32
+#define BUFF_LEN 64
+int config;
 
-#define LED_PIN PA5
-#define BUFF_LEN 32
 
-char* webpageStart = "<!DOCTYPE html><html><head><title>E155 Web Server Demo Webpage</title>\
+char* webpageStart = "<!DOCTYPE html><html><head><title>Bella's Temperature Sensor</title>\
 	<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\
 	</head>\
-	<body><h1>E155 Web Server Demo Webpage</h1>";
+	<body><h1>Bella's Temperature Sensor</h1>";
 
 char* ledStr = "<p>LED Control:</p><form action=\"ledon\"><input type=\"submit\" value=\"Turn the LED on!\"></form>\
 	<form action=\"ledoff\"><input type=\"submit\" value=\"Turn the LED off!\"></form>";
@@ -54,25 +54,23 @@ int updateLEDStatus(char request[])
 	return led_status;
 }
 
-int resolution(char request[])
+void resolution(char request[])
 {
-	int config = 0xE0;
+        
 	if (inString(request, "8-bit")==1) {
-		config = 0xE0;
+                config = 0xE0;
 	}
 	else if (inString(request, "9-bit")==1) {
-		config = 0xE2;
+                config = 0xE2;
 	}
         else if (inString(request, "10-bit")==1) {
-		config = 0xE4;
+                config = 0xE4;
 	}
         else if (inString(request, "11-bit")==1) {
-		config = 0xE6;
+                config = 0xE6;
 	}else if (inString(request, "12-bit")==1) {
-		config = 0xEE;
+                config = 0xEE;
         }
-
-	return config;
 }
 
 
@@ -91,7 +89,6 @@ configureClock();
 USART_TypeDef * USART = initUSART(USART1_ID, 125000);
 
 initSPI(3,0,1);
-ds1722_init(0xE0);
 
 
 while(1){
@@ -112,20 +109,38 @@ while(1){
     }
   
     // Update string with current LED state
-
+  resolution(request);
   int led_status = updateLEDStatus(request);
-  int config = resolution(request);
+
   ds1722_init(config);
 
-  int temp = ds1722_read_temp();
-  //delay_millis(TIM15, 100);
-
-
+  float temp = ds1722_read_temp();
 
 
     char ledStatusStr[20];
     char tempStr[32];
+    char resStatusStr[24];
+
+    if (led_status == 1)
+      sprintf(ledStatusStr,"LED is on!");
+    else if (led_status == 0)
+      sprintf(ledStatusStr,"LED is off!");
+
+    if (config == 0xE0)
+      sprintf(resStatusStr, "8-bit");
+    else if (config == 0xE2)
+      sprintf(resStatusStr, "9-bit");
+    else if (config == 0xE4)
+      sprintf(resStatusStr, "10-bit");
+    else if (config == 0xE6)
+      sprintf(resStatusStr, "11-bit");
+    else if (config == 0xEE)
+      sprintf(resStatusStr, "12-bit");
     
+    int whole = (int)temp;
+int frac = (int)((temp - whole) * 100);  // two decimal places
+
+sprintf(tempStr, "%d.%d", whole, frac);
 
 
     // finally, transmit the webpage over UART
@@ -134,11 +149,14 @@ while(1){
     sendString(USART, Resolution); // button for controlling Resolution
 
     sendString(USART, "<h2>LED Status</h2>");
-
-
     sendString(USART, "<p>");
     sendString(USART, ledStatusStr);
     sendString(USART, "</p>");
+
+    sendString(USART, "<h2>Resolution Status</h2>");  
+    sendString(USART, "<p>");                        
+    sendString(USART, resStatusStr);                 
+    sendString(USART, "</p>");      
 
     
     sendString(USART, "<h2>Temperature</h2>");
