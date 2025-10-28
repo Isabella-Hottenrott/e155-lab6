@@ -12,7 +12,7 @@
 
 
 void ds1722_init(int resolution);
-int ds1722_read_temp(void);
+int16_t ds1722_read_temp(void);
 
 
 #endif

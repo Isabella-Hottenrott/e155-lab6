@@ -5,6 +5,7 @@
 #include "STM32L432KC_SPI.h"
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h>
 
 
 // want to config SPI slave before themaster sends a clock
@@ -32,7 +33,7 @@ void ds1722_init(int config){
 }
 
 
-float ds1722_read_temp(void){
+int16_t ds1722_read_temp(void){
     
 
     digitalWrite(PB0, PIO_HIGH); //pin PB6 is chip enable pin. set high
@@ -47,6 +48,7 @@ float ds1722_read_temp(void){
 
    
     int16_t raw = ((int16_t)upperhalf << 8) | lowerhalf; // keep sign by shifting arithmetic
-    raw = raw >> 4;                       // shift by 8 because we only have 8 bit but a 16 bit rep
-    return (float) raw*0.0625f;
+    return raw;
+
 }
+

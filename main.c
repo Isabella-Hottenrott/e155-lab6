@@ -114,7 +114,7 @@ while(1){
 
   ds1722_init(config);
 
-  float temp = ds1722_read_temp();
+  int16_t temp = ds1722_read_temp();
 
 
     char ledStatusStr[20];
@@ -136,12 +136,18 @@ while(1){
       sprintf(resStatusStr, "11-bit");
     else if (config == 0xEE)
       sprintf(resStatusStr, "12-bit");
+
+
     
-    int whole = (int)temp;
-int frac = (int)((temp - whole) * 100);  // two decimal places
+    int16_t wholenum = temp >> 8;          // high byte → integer part (sign-extended)
+    uint8_t fracnum = (temp >> 4) & 0x0F; // low nibble → fraction bits
+    float frac = fracnum * 0.0625f;      // each bit = 1/16 °C
+    float tempC = (float)wholenum + frac;
 
-sprintf(tempStr, "%d.%d", whole, frac);
+    sprintf(tempStr, "%.4f", tempC);
 
+//or whole= %d frac float= %f, frac uint= %d
+//wholenum, frac, fracnum
 
     // finally, transmit the webpage over UART
     sendString(USART, webpageStart); // webpage header code
