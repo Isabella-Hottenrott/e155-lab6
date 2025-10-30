@@ -144,7 +144,7 @@ while(1){
     float frac = fracnum * 0.0625f;      // each bit = 1/16 °C
     float tempC = (float)wholenum + frac;
 
-    sprintf(tempStr, "%.4f", tempC);
+    sprintf(tempStr, "%.4f °C", tempC);
 
 //or whole= %d frac float= %f, frac uint= %d
 //wholenum, frac, fracnum
