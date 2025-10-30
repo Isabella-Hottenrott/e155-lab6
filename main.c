@@ -1,8 +1,8 @@
 /*
-File: Lab_6_JHB.c
-Author: Josh Brake
-Email: jbrake@hmc.edu
-Date: 9/14/19
+// Isabella Hottenrott
+// ihottenrott@g.hmc.edu
+// 30/10/25
+// main.c
 */
 
 #include "STM32L432KC.h"
@@ -56,7 +56,6 @@ int updateLEDStatus(char request[])
 
 void resolution(char request[])
 {
-        
 	if (inString(request, "8-bit")==1) {
                 config = 0xE0;
 	}
@@ -112,9 +111,10 @@ while(1){
   resolution(request);
   int led_status = updateLEDStatus(request);
 
+  //configure DS1722 with new settings and read temperature
   ds1722_init(config);
 
-  int16_t temp = ds1722_read_temp();
+
 
 
     char ledStatusStr[20];
@@ -137,17 +137,14 @@ while(1){
     else if (config == 0xEE)
       sprintf(resStatusStr, "12-bit");
 
-
-    
-    int16_t wholenum = temp >> 8;          // high byte → integer part (sign-extended)
-    uint8_t fracnum = (temp >> 4) & 0x0F; // low nibble → fraction bits
-    float frac = fracnum * 0.0625f;      // each bit = 1/16 °C
+    int16_t temp = ds1722_read_temp();
+    int16_t wholenum = temp >> 8;         // MSB is in top 8 bits of temp
+    uint8_t fracnum = (temp >> 4)&0x0F;   // relevant LSB is in 4-to-last bits of temp. Mask just in case
+    float frac = fracnum * 0.0625f;      // each fractional bit = 1/16 °C
     float tempC = (float)wholenum + frac;
 
-    sprintf(tempStr, "%.4f °C", tempC);
+    sprintf(tempStr, "%.4f degrees Celsius", tempC);
 
-//or whole= %d frac float= %f, frac uint= %d
-//wholenum, frac, fracnum
 
     // finally, transmit the webpage over UART
     sendString(USART, webpageStart); // webpage header code

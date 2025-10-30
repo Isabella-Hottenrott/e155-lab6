@@ -1,5 +1,7 @@
 // STM32F401RE_RCC.h
-// Header for RCC functions
+// Isabella Hottenrott
+// ihottenrott@g.hmc.edu
+// 30/10/25
 
 #ifndef STM32L4_RCC_H
 #define STM32L4_RCC_H

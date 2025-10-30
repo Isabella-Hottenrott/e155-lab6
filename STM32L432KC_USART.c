@@ -1,4 +1,7 @@
 // STM32L432KC_USART.c
+// Isabella Hottenrott
+// ihottenrott@g.hmc.edu
+// 30/10/25
 // Source code for USART functions
 
 #include "STM32L432KC.h"

@@ -1,8 +1,8 @@
 /**
     Main Header: Contains general defines and selected portions of CMSIS files
-    @file main.h
-    @author Josh Brake
-    @version 1.0 10/7/2020
+// Isabella Hottenrott
+// ihottenrott@g.hmc.edu
+// 30/10/25
 */
 
 #ifndef MAIN_H

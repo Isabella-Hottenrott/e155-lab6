@@ -1,8 +1,7 @@
 // STM32L432KC_SPI.h
-// TODO: <YOUR NAME>
-// TODO: <YOUR EMAIL>
-// TODO: <DATE>
-// TODO: <SHORT DESCRIPTION OF WHAT THIS FILE DOES>
+// Isabella Hottenrott
+// ihottenrott@g.hmc.edu
+// 30/10/25
 
 #ifndef STM32L4_SPI_H
 #define STM32L4_SPI_H
@@ -17,10 +16,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Definitions
 ///////////////////////////////////////////////////////////////////////////////
-
-// want this to be master
-// want full duplex communication
-//41.4.5 look at NSS if needed
 
 
 // Values which "val" can take on in digitalWrite()
@@ -45,14 +40,10 @@
 // Function prototypes
 ///////////////////////////////////////////////////////////////////////////////
 
-/* Enables the SPI peripheral and intializes its clock speed (baud rate), polarity, and phase.
- *    -- br: (0b000 - 0b111). The SPI clk will be the master clock / 2^(BR+1).
- *    -- cpol: clock polarity (0: inactive state is logical 0, 1: inactive state is logical 1).
- *    -- cpha: clock phase (0: data captured on leading edge of clk and changed on next edge, 
- *          1: data changed on leading edge of clk and captured on next edge)
- * Refer to the datasheet for more low-level details. */ 
+/* Enables the SPI peripheral and intializes its clock speed (baud rate), polarity, and phase. */
 void initSPI(int br, int cpol, int cpha);
 
+/*Sets up GPIO Port B pins for SPI functionality*/
 void SPIGPIO(void);
 
 /* Transmits a character (1 byte) over SPI and returns the received character.

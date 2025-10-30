@@ -1,5 +1,7 @@
 // STM32L432KC_GPIO.c
-// Source code for GPIO functions
+// Isabella Hottenrott
+// ihottenrott@g.hmc.edu
+// 30/10/25
 
 #include "STM32L432KC_RCC.h"
 #include "STM32L432KC_GPIO.h"

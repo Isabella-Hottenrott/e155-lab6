@@ -1,3 +1,6 @@
+// Isabella Hottenrott
+// ihottenrott@g.hmc.edu
+// 30/10/25
 // DS1722.h
 
 

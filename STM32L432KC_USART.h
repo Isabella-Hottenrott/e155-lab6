@@ -1,4 +1,7 @@
 // STM32F401RE_USART.h
+// Isabella Hottenrott
+// ihottenrott@g.hmc.edu
+// 30/10/25
 // Header for USART functions
 
 #ifndef STM32L4_USART_H

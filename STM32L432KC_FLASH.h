@@ -1,4 +1,7 @@
 // STM32L432KC_FLASH.h
+// Isabella Hottenrott
+// ihottenrott@g.hmc.edu
+// 30/10/25
 // Header for FLASH functions
 
 #ifndef STM32L4_FLASH_H

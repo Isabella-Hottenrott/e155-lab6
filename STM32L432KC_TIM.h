@@ -1,4 +1,7 @@
 // STM32F401RE_TIM.h
+// Isabella Hottenrott
+// ihottenrott@g.hmc.edu
+// 30/10/25
 // Header for TIM functions
 
 #ifndef STM32L4_TIM_H
