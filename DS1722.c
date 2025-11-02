@@ -20,25 +20,21 @@ void ds1722_init(int config){
     spiSendReceive(ds1722_cfg_addr);           // Send config address
     spiSendReceive(config);                    // Send config selection   
     digitalWrite(PB0, PIO_LOW);
-
-   // digitalWrite(PB0, PIO_HIGH);              //Set CE high to read
-   // uint8_t config2 = spiSendReceive(0x00);   //Optional Readback address
-   // uint8_t config3 = spiSendReceive(0x00);   //Optional Optional return Readback
-   // digitalWrite(PB0, PIO_LOW); 
 }
 
 
 //Read the DS1722 Temperature by asserting and deasserting CE twice: once for MSB reading, onece for LSB reading
 //Return the combined read value as a single 16-bit output
 int16_t ds1722_read_temp(void){
+
     digitalWrite(PB0, PIO_HIGH);               // Set CE high
     spiSendReceive(0x02);
-    uint8_t upperhalf = spiSendReceive(0x02);
+    uint8_t upperhalf = spiSendReceive(0x00);
     digitalWrite(PB0, PIO_LOW);               //Set CE low
 
     digitalWrite(PB0, PIO_HIGH);              //Set CE high
     spiSendReceive(0x01);
-    uint8_t lowerhalf = spiSendReceive(0x01);
+    uint8_t lowerhalf = spiSendReceive(0x00);
     digitalWrite(PB0, PIO_LOW);               //Set CE low
 
    

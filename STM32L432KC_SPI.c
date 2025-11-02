@@ -20,7 +20,7 @@ RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
 //disable SPI for the configurations
 SPI1->CR1 |= _VAL2FLD(SPI_CR1_SPE, 0);                          
 
-SPI1->CR1 |= _VAL2FLD(SPI_CR1_BR, 0b011);            // set the Baud rate (will want 3)
+SPI1->CR1 |= _VAL2FLD(SPI_CR1_BR, 0b111);            // set the Baud rate (will want 3)
 SPI1->CR1 |= _VAL2FLD(SPI_CR1_CPOL, 0);              // set CPOL 0 when idle
 SPI1->CR1 |= _VAL2FLD(SPI_CR1_CPHA, 1);              // set CPHA 1 to match DS1722
 SPI1->CR1 |= _VAL2FLD(SPI_CR1_BIDIMODE, 0);          // two line unidirectional data mode
@@ -40,10 +40,15 @@ pinMode(PB4, GPIO_ALT);                             // PB4 = MISO want AF5
 GPIOB->AFR[0] |= _VAL2FLD(GPIO_AFRL_AFSEL4, 5);   //AF5
 pinMode(PB5, GPIO_ALT);                             // PB5 = MOSI want AF5
 GPIOB->AFR[0] |= _VAL2FLD(GPIO_AFRL_AFSEL5, 5);   //AF5
+GPIOB->OTYPER &= ~(GPIO_OTYPER_OT4);             // push-pull for MISO line
+GPIOB->PUPDR &= ~(GPIO_PUPDR_PUPD4_Msk);         // 00 = no pull-up/down for MISO
+
+
 pinMode(PB0, GPIO_OUTPUT);                          // PB0 = Chip Select
+
 digitalWrite(PB0, PIO_LOW);
 
-GPIOB->OSPEEDR |= _VAL2FLD(GPIO_OSPEEDR_OSPEED3, 1); 
+
 
 SPI1->CR1 |= _VAL2FLD(SPI_CR1_SPE, 1);                            //Enable SPI
 }
