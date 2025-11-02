@@ -1,0 +1,14 @@
+
+ int config = 0xEE;
+
+ ds1722_init(config);
+
+ int16_t temp = ds1722_read_temp();
+    int16_t wholenum = temp >> 8;         // MSB is in top 8 bits of temp
+    uint8_t fracnum = (temp >> 4)&0x0F;   // relevant LSB is in 4-to-last bits of temp. Mask just in case
+    float frac = fracnum * 0.0625f;      // each fractional bit = 1/16 °C
+    float tempC = (float)wholenum + frac;
+
+    printf("%.4f degrees Celsius with %h res\n", tempC, config);
+
+    while(1);
