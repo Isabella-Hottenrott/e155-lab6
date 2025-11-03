@@ -1,99 +1,63 @@
 /*
-File: Lab_6_JHB.c
-Author: Josh Brake
-Email: jbrake@hmc.edu
-Date: 9/14/19
+// Isabella Hottenrott
+// ihottenrott@g.hmc.edu
+// 30/10/25
+// main.c
 */
 
 #include "STM32L432KC.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 
 #define LED_PIN PA5
-#define BUFF_LEN 32
+#define BUFF_LEN 64
 
 
 
 int main(void) {
-  configureFlash();
-  configureClock();
+configureFlash();
+configureClock();
+RCC->APB2ENR |= (1 << 17);
 
   gpioEnable(GPIO_PORT_A);
   gpioEnable(GPIO_PORT_B);
   gpioEnable(GPIO_PORT_C);
   
-  initTIM(TIM15);
 
   pinMode(LED_PIN, GPIO_OUTPUT);
   digitalWrite(LED_PIN, 0);
   
-//  USART_TypeDef * USART = initUSART(USART1_ID, 125000);
-// GPIO enables for SPI
-RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
-RCC->AHB2ENR |= RCC_AHB2ENR_GPIOBEN;
+// try all polarity combinations
+// try making it so that at higher bit res, the first measurement is discarded
 
-RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
-//disable SPI for the configurations
-SPI1->CR1 &= ~SPI_CR1_SPE;
-
-SPI1->CR1 |= _VAL2FLD(SPI_CR1_BR, 3);   // set the Baud rate (will want 3)
-SPI1->CR1 |= _VAL2FLD(SPI_CR1_CPOL, 0);   // set CPOL (will want 0?)// check this acc sets to 0
-SPI1->CR1 |= _VAL2FLD(SPI_CR1_CPHA, 1);   // set CPHA (will want 1)// check this acc sets to 0
-SPI1->CR1 |= _VAL2FLD(SPI_CR1_BIDIMODE, 0);   // two line unidirectional data mode
-SPI1->CR1 |= _VAL2FLD(SPI_CR1_LSBFIRST, 0);   // msb transmitted first
-
-SPI1->CR1 |= _VAL2FLD(SPI_CR1_SSM, 1);   // // check this acc sets to 0
-SPI1->CR1 |= _VAL2FLD(SPI_CR1_SSI, 1);   // value forced onto NSS pin
-SPI1->CR1 |= _VAL2FLD(SPI_CR1_MSTR, 1);   // master
-
-
-// to the SPI_CR2 Reg
-SPI1->CR2 |= _VAL2FLD(SPI_CR2_DS, 7);
-SPI1->CR2 |= _VAL2FLD(SPI_CR2_FRXTH, 1); 
-SPI1->CR2 |= _VAL2FLD(SPI_CR2_SSOE, 0);
-
-pinMode(PB3, GPIO_ALT); // PB3 == SCLK want AF5
-GPIOB->AFR[0] |= (0b101 << GPIO_AFRL_AFSEL3_Pos);   //AF5
-pinMode(PB4, GPIO_ALT); // PB4== MISO want AF5
-GPIOB->AFR[0] |= (0b101 << GPIO_AFRL_AFSEL4_Pos);   //AF5
-pinMode(PB5, GPIO_ALT); // PB5 = MOSI want AF5
-GPIOB->AFR[0] |= (0b101 << GPIO_AFRL_AFSEL5_Pos);   //AF5
-pinMode(PB0, GPIO_OUTPUT);                       // PB6 = Chip Select
-digitalWrite(PB0, PIO_LOW);
-
-GPIOB->OSPEEDR |= GPIO_OSPEEDR_OSPEED3;
-
-
-SPI1->CR1 |= SPI_CR1_SPE; 
+initSPI(3,0,1);
 
 
 
+ int config_list[5] = {0x00, 0x02, 0x04, 0x06, 0x0E};
 
-while(1){
+ for (int j=0; j<5; j++){
+ds1722_init(config_list[j]);
+printf("config %d:\n", j);
 
-int a = spiSendReceive(0xa1);
-int b = spiSendReceive(0x02);
-int c = spiSendReceive(0xff);
-int d = spiSendReceive(0x02);
-int e = spiSendReceive(0x02);
-int f = spiSendReceive(0x02);
-int g = spiSendReceive(0x02);
-int h = spiSendReceive(0x02);
+ for (int i=0; i<8; i++){
 
-printf("%d\n", a);
-printf("%d\n", b);
-printf("%d\n", c);
-printf("%d\n", d);
-printf("%d\n", e);
-printf("%d\n", f);
-printf("%d\n", g);
-printf("%d\n", h);
+ int16_t temp = ds1722_read_temp();
+    int16_t wholenum = temp >> 8;         // MSB is in top 8 bits of temp
+    uint8_t fracnum = (temp >> 4)&0x0F;   // relevant LSB is in 4-to-last bits of temp. Mask just in case
+    float frac = fracnum * 0.0625f;      // each fractional bit = 1/16 °C
+    float tempC = (float)wholenum + frac;
 
-
-//falling edge
-
+    printf("%.4f degrees Celsius\n", tempC);
+    config_delay(500);
+    config_delay(500);
+    config_delay(500);
+    config_delay(500);
 }
+}
+while(1);
 
 }
 
