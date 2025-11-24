@@ -20,11 +20,6 @@ void ds1722_init(int config){
     spiSendReceive(ds1722_cfg_addr);           // Send config address
     spiSendReceive(config);                    // Send config selection   
     digitalWrite(PB0, PIO_LOW);
-
-   // digitalWrite(PB0, PIO_HIGH);              //Set CE high to read
-   // uint8_t config2 = spiSendReceive(0x00);   //Optional Readback address
-   // uint8_t config3 = spiSendReceive(0x00);   //Optional Optional return Readback
-   // digitalWrite(PB0, PIO_LOW); 
 }
 
 

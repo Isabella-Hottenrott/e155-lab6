@@ -17,30 +17,27 @@
 
 
 int main(void) {
+
+int config_list[5] = {0x00, 0x02, 0x04, 0x06, 0x0E}; // list of sensor configurations
+
 configureFlash();
 configureClock();
+
+
 RCC->APB2ENR |= (1 << 17);
-
-  gpioEnable(GPIO_PORT_A);
-  gpioEnable(GPIO_PORT_B);
-  gpioEnable(GPIO_PORT_C);
+gpioEnable(GPIO_PORT_A); //enable all GPIO ports
+gpioEnable(GPIO_PORT_B);
+gpioEnable(GPIO_PORT_C);
   
 
-  pinMode(LED_PIN, GPIO_OUTPUT);
-  digitalWrite(LED_PIN, 0);
+pinMode(LED_PIN, GPIO_OUTPUT); // Set my output GPIO for the LED
+digitalWrite(LED_PIN, 0);
   
-// try all polarity combinations
-// try making it so that at higher bit res, the first measurement is discarded
-
-initSPI(3,0,1);
+initSPI(3,0,1); // initialize SPI
 
 
-
- int config_list[5] = {0x00, 0x02, 0x04, 0x06, 0x0E};
-
- for (int j=0; j<5; j++){
-ds1722_init(config_list[j]);
-printf("config %d:\n", j);
+for (int j=0; j<5; j++){
+  ds1722_init(config_list[j]);
 
  for (int i=0; i<8; i++){
 

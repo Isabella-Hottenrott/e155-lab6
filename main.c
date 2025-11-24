@@ -24,7 +24,7 @@ char* webpageStart = "<!DOCTYPE html><html><head><title>Bella's Temperature Sens
 char* ledStr = "<p>LED Control:</p><form action=\"ledon\"><input type=\"submit\" value=\"Turn the LED on!\"></form>\
 	<form action=\"ledoff\"><input type=\"submit\" value=\"Turn the LED off!\"></form>";
 
-char* Resolution = "<p>Resolution:</p><form action=\"8-bit\"><input type=\"submit\" value=\"8-bit\"></form>\
+char* Resolution = "<p>Resolution:</p><form action=\"8-bit\"><input type=\"submit\"value=\"8-bit\"></form>\
 	<form action=\"9-bit\"><input type=\"submit\" value=\"9-bit\"></form>\
 	<form action=\"10-bit\"><input type=\"submit\" value=\"10-bit\"></form>\
 	<form action=\"11-bit\"><input type=\"submit\" value=\"11-bit\"></form>\
@@ -38,56 +38,22 @@ int inString(char request[], char des[]) {
 	return -1;
 }
 
-int updateLEDStatus(char request[])
-{
-	int led_status = 0;
-	// The request has been received. now process to determine whether to turn the LED on or off
-	if (inString(request, "ledoff")==1) {
-		digitalWrite(LED_PIN, PIO_LOW);
-		led_status = 0;
-	}
-	else if (inString(request, "ledon")==1) {
-		digitalWrite(LED_PIN, PIO_HIGH);
-		led_status = 1;
-	}
-
-	return led_status;
-}
-
-void resolution(char request[])
-{
-	if (inString(request, "8-bit")==1) {
-                config = 0xE0;
-	}
-	else if (inString(request, "9-bit")==1) {
-                config = 0xE2;
-	}
-        else if (inString(request, "10-bit")==1) {
-                config = 0xE4;
-	}
-        else if (inString(request, "11-bit")==1) {
-                config = 0xE6;
-	}else if (inString(request, "12-bit")==1) {
-                config = 0xEE;
-        }
-}
+int updateLEDStatus(char request[]);
+void resultion(char request[]);
 
 
 int main(void) {
-configureFlash();
+configureFlash(); // enable Flash, Clocks, GPIOs
 configureClock();
+gpioEnable(GPIO_PORT_A);
+gpioEnable(GPIO_PORT_B);
+gpioEnable(GPIO_PORT_C);
+pinMode(LED_PIN, GPIO_OUTPUT); // set output LED
+digitalWrite(LED_PIN, 0);
+initTIM(TIM15);
 
-  gpioEnable(GPIO_PORT_A);
-  gpioEnable(GPIO_PORT_B);
-  gpioEnable(GPIO_PORT_C);
-  
-  initTIM(TIM15);
-  pinMode(LED_PIN, GPIO_OUTPUT);
-  digitalWrite(LED_PIN, 0);
-  
-USART_TypeDef * USART = initUSART(USART1_ID, 125000);
-
-initSPI(3,0,1);
+USART_TypeDef * USART = initUSART(USART1_ID, 125000); // initialize UART
+initSPI(3,0,1); // initialize SPI
 
 
 while(1){
@@ -107,34 +73,33 @@ while(1){
       request[charIndex++] = readChar(USART);
     }
   
-    // Update string with current LED state
+  // Update string with current LED state
   resolution(request);
   int led_status = updateLEDStatus(request);
-
-  //configure DS1722 with new settings and read temperature
-  ds1722_init(config);
-
-
 
 
     char ledStatusStr[20];
     char tempStr[32];
     char resStatusStr[24];
+    char configStatus[24];
+
+
+    sprintf(configStatus, "%d", config);
 
     if (led_status == 1)
       sprintf(ledStatusStr,"LED is on!");
     else if (led_status == 0)
       sprintf(ledStatusStr,"LED is off!");
 
-    if (config == 0xE0)
+    if (config == 0x00)
       sprintf(resStatusStr, "8-bit");
-    else if (config == 0xE2)
+    else if (config == 0x02)
       sprintf(resStatusStr, "9-bit");
-    else if (config == 0xE4)
+    else if (config == 0x04)
       sprintf(resStatusStr, "10-bit");
-    else if (config == 0xE6)
+    else if (config == 0x06)
       sprintf(resStatusStr, "11-bit");
-    else if (config == 0xEE)
+    else if (config == 0x0E)
       sprintf(resStatusStr, "12-bit");
 
     int16_t temp = ds1722_read_temp();
@@ -166,9 +131,55 @@ while(1){
     sendString(USART, "</p>");
     sendString(USART, tempStr);
     sendString(USART, "</p>");
+
+    sendString(USART, "<h2>Actual Config</h2>");
+    sendString(USART, "</p>");
+    sendString(USART, configStatus);
+    sendString(USART, "</p>");
   
     sendString(USART, webpageEnd);
 }
 
 }
 
+
+
+
+void resolution(char request[])
+{
+	if (inString(request, "8-bit")==1) {
+                config = 0x00;
+                ds1722_init(config);
+	}
+	else if (inString(request, "9-bit")==1) {
+                config = 0x02;
+                ds1722_init(config);
+	}
+        else if (inString(request, "10-bit")==1) {
+                config = 0x04;
+                ds1722_init(config);
+	}
+        else if (inString(request, "11-bit")==1) {
+                config = 0x06;
+                ds1722_init(config);
+	}else if (inString(request, "12-bit")==1) {
+                config = 0x0E;
+                ds1722_init(config);
+        }
+}
+
+int updateLEDStatus(char request[])
+{
+	int led_status = 0;
+	// The request has been received. now process to determine whether to turn the LED on or off
+	if (inString(request, "ledoff")==1) {
+		digitalWrite(LED_PIN, PIO_LOW);
+		led_status = 0;
+	}
+	else if (inString(request, "ledon")==1) {
+		digitalWrite(LED_PIN, PIO_HIGH);
+		led_status = 1;
+	}
+
+	return led_status;
+}
